@@ -94,6 +94,7 @@ def testReportMatches():
     print "7. After a match, players have updated standings."
     deleteMatches()
     standings = playerStandings()
+    print len(standings)
     if len(standings) != 4:
         raise ValueError("Match deletion should not change number of players in standings.")
     for (i, n, w, m) in standings:
@@ -120,6 +121,7 @@ def testPairings():
     standings = playerStandings()
     [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
     pairings = swissPairings()
+    print pairings
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
