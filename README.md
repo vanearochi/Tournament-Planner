@@ -18,6 +18,7 @@
         https://github.com/vanearochi/Tournament-Planner
 ```
 
+
 ## Project Files.
 
 * tournament.sql
@@ -76,6 +77,7 @@
 ```
         $ \q
 ```
+
 
 ## Running the tests
 

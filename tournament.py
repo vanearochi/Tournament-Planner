@@ -32,8 +32,6 @@ def registerPlayer(name):
     cursor.execute("""INSERT INTO Players(Name) VALUES (%s)""", (name,))
     conn.commit()
     cursor.execute("""Select * from Players order by Id ASC""")
-    print cursor.fetchall()
-
     closeConnection(conn)
 
 
@@ -46,6 +44,7 @@ def countPlayers():
     closeConnection(conn)
     return rows[0]
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     conn = connect()
@@ -53,8 +52,6 @@ def deletePlayers():
     cursor.execute("""Delete from Players;""")
     conn.commit()
     closeConnection(conn)
-
-
 
 
 def deleteMatches():
@@ -96,7 +93,6 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
     conn = connect()
     cursor = conn.cursor()
     cursor.execute("""SELECT * from Players """)
@@ -114,7 +110,6 @@ def playerStandings():
                             """)
         standing_list = cursor.fetchall()
         closeConnection(conn)
-        #print standing_list
         return standing_list
     else:
         # If matches table is not empty performs a query that count the number of wined matches and played matches
@@ -125,11 +120,8 @@ def playerStandings():
                players GROUP BY players.name, players.id order by wins DESC;""")
         standing_list = cursor.fetchall()
         closeConnection(conn)
-        print standing_list
+
         return standing_list
-
-
-#playerStandings()
 
 
 def swissPairings():
@@ -147,7 +139,6 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
     player_standing = playerStandings()
     # Creates list of pairs from player_standing list
     # With a lil help from: http://stackoverflow.com/questions/2233204/how-does-zipitersn-work-in-python
@@ -157,24 +148,5 @@ def swissPairings():
         player_1 = pair[0]
         player_2 = pair[1]
         pairing_list.append((player_1[0], player_1[1], player_2[0], player_2[1]))
-    pairing_list
+
     return pairing_list
-#
-# registerPlayer("a")
-# registerPlayer("b")
-# registerPlayer("c")
-# registerPlayer("d")
-# registerPlayer("e")
-# registerPlayer("f")
-# registerPlayer("g")
-# registerPlayer("j")
-# reportMatch(1,2)
-# reportMatch(3,4)
-# reportMatch(5,6)
-# reportMatch(7,8)
-playerStandings()
-print swissPairings()
-# reportMatch(7,5)
-# reportMatch(1,3)
-# reportMatch(2,8)
-# reportMatch(4,6)
