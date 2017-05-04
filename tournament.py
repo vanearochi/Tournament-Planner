@@ -73,7 +73,7 @@ def reportMatch(winner, loser):
     conn = connect()
     cursor = conn.cursor()
     cursor.execute(
-        """INSERT INTO Matches(Created, Winner, Loser) VALUES ('%s', %s, %s);""" % (
+        """INSERT INTO Matches(Created, Winner, Loser) VALUES (%s, %s, %s);""", (
             datetime_now, winner, loser, ))
     conn.commit()
     closeConnection(conn)
