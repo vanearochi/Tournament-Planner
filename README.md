@@ -69,6 +69,10 @@
 ```
         vagrant=> create database tournament.sql
 ```
+* Connect to the tournament database:
+```
+        vagrant=> \c tournament
+```
 * Import tournament.sql file to PostgreSQL to create tables:
 ```
         $ \i tournament.sql

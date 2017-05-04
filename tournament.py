@@ -3,6 +3,7 @@
 # tournament.py -- implementation of a Swiss-system tournament
 #
 import psycopg2
+import datetime
 
 
 def connect():
@@ -31,9 +32,7 @@ def registerPlayer(name):
     cursor = conn.cursor()
     cursor.execute("""INSERT INTO Players(Name) VALUES (%s)""", (name,))
     conn.commit()
-    cursor.execute("""Select * from Players order by Id ASC""")
     closeConnection(conn)
-
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -70,14 +69,14 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    datetime_now = datetime.datetime.now()
     conn = connect()
     cursor = conn.cursor()
     cursor.execute(
-        """INSERT INTO Matches(Winner, Loser) VALUES ({Winner}, {Loser})""".format(Winner=winner, Loser=loser, ))
+        """INSERT INTO Matches(Created, Winner, Loser) VALUES ('%s', %s, %s);""" % (
+            datetime_now, winner, loser, ))
     conn.commit()
     closeConnection(conn)
-
-
 
 
 def playerStandings():
@@ -95,33 +94,15 @@ def playerStandings():
     """
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute("""SELECT * from Players """)
-    cursor.execute("""SElect * from Matches""")
-    matches_played = cursor.fetchall()
-
-    if len(matches_played) == 0:
-        # With a lil help from: http://stackoverflow.com/questions/4138734/how-to-return-0-if-table-empty-1-otherwise
-        # If matches table is empty performs a query that checks if table is empty and returns 0 for the selected row
-        cursor.execute("""SELECT players.id, players.name,
-                          CASE
-                            WHEN EXISTS (SELECT matches.winner FROM matches LIMIT 1) THEN 1 ELSE 0 END,
-                          CASE
-                           WHEN EXISTS (SELECT matches.id FROM matches LIMIT 1) THEN 1 ELSE 0 END from players
-                            """)
-        standing_list = cursor.fetchall()
-        closeConnection(conn)
-        return standing_list
-    else:
-        # If matches table is not empty performs a query that count the number of wined matches and played matches
-        cursor.execute(
-            """SELECT players.id, players.name,
-               COUNT(CASE WHEN players.id=matches.winner THEN 1 END) as wins,
-               Count(CASE WHEN players.id=matches.winner or players.id=matches.loser THEN 1 END) as played from matches,
-               players GROUP BY players.name, players.id order by wins DESC;""")
-        standing_list = cursor.fetchall()
-        closeConnection(conn)
-
-        return standing_list
+    cursor.execute("""SElECT Players.id as Id, Players.name as Name,
+                      COUNT(CASE WHEN Players.id=Matches.winner THEN 1 END) as win,
+                      COUNT(Matches.id) as Played
+                      FROM Players left outer join matches on (players.id = matches.winner or players.id= matches.loser)
+                      GROUP BY Players.id, Players.name
+                      ORDER BY win desc""")
+    standing_list = cursor.fetchall()
+    closeConnection(conn)
+    return standing_list
 
 
 def swissPairings():
